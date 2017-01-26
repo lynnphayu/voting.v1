@@ -117,7 +117,7 @@ $( document ).ready( function( ) {
 
                   // } );
 
-                  king_voted_list.orderByChild( 'user_id' )
+                  king_voted_list.chid('user_id').orderByChild( 'user_id' )
                         .equalTo( user.id )
                         .once( 'value' )
                         .then( function( snapshot ) {
