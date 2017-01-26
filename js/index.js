@@ -8,8 +8,8 @@ $( document ).ready( function( ) {
       };
       firebase.initializeApp( config );
 
-      var king_vote = firebase.database( ).ref( ).child( 'vote/king' );
-      var queen_vote = firebase.database( ).ref( ).child( 'vote/queen' );
+      var king_vote = firebase.database( ).ref( ).child( 'king_vote' );
+      var queen_vote = firebase.database( ).ref( ).child( 'queen_vote' );
       var king_voted_list = firebase.database( ).ref( ).child( 'king' );
       var queen_voted_list = firebase.database( ).ref( ).child( 'queen' );
 
@@ -21,10 +21,13 @@ $( document ).ready( function( ) {
 
       $( '.king' ).click( function( e ) {
             e.preventDefault( );
-            king_vote.transaction( function( vote ) {
+
+            king_vote.child( e.target.id ).transaction( function( vote ) {
                   if ( vote != null ) {
                         vote++;
-                        king_vote.set({ user_id : firebase.auth().currentUser });
+                        var updates = {};
+                        updates[ 'king/' + firebase.auth( ).currentUser.uid ] = 1;
+                        firebase.database( ).ref( ).update( updates );
                         $( '.king' ).prop( 'disabled', true );
                   }
                   return vote;
@@ -33,30 +36,20 @@ $( document ).ready( function( ) {
 
       $( '.queen' ).click( function( e ) {
             e.preventDefault( );
-            queen_vote.transaction( function( vote ) {
-                  // if ( vote != null ) {
-                        vote++;
-                        queen_vote.set({ user_id : firebase.auth().currentUser });
-                        $( '.queen' ).prop( 'disabled', true );
-                  // }
-                  return vote;
-            } );
-      } );
 
-
-      $( '.style' ).click( function( e ) {
-            e.preventDefault( );
-            style_vote.transaction( function( vote ) {
+            queen_vote.child( e.target.id ).transaction( function( vote ) {
                   if ( vote != null ) {
                         vote++;
-                        var obj = {};
-                        obj[ 'style_voted_list/' + firebase.auth( ).currentUser ] = 1;
-                        style_voted_list.update( obj );
-                        $( '.style' ).prop( 'disabled', true );
+                        var updates = {};
+                        updates[ 'queen/' + firebase.auth( ).currentUser.uid ] = 1;
+                        firebase.database( ).ref( ).update( updates );
+                        $( '.queen' ).prop( 'disabled', true );
                   }
                   return vote;
             } );
       } );
+
+
 
 
       $( '#facebook_login' ).click( function( e ) {
@@ -68,11 +61,9 @@ $( document ).ready( function( ) {
 
                         $( '#facebook_login' ).hide( );
                         $( '#Glide' ).show( );
-                        console.log( result.user.uid );
-                        current_user_id = result.user.id;
 
-                        king_voted_list.orderByChild( 'user_id' )
-                              .equalTo( user.id )
+                        king_voted_list.orderByKey( )
+                              .equalTo( result.user.uid )
                               .once( 'value' )
                               .then( function( snapshot ) {
                                     var value = snapshot.val( );
@@ -81,8 +72,8 @@ $( document ).ready( function( ) {
                                     }
                               } );
 
-                        queen_voted_list.orderByChild( 'user_id' )
-                              .equalTo( user.id )
+                        queen_voted_list.orderByKey( )
+                              .equalTo( result.user.uid )
                               .once( 'value' )
                               .then( function( snapshot ) {
                                     var value = snapshot.val( );
@@ -116,9 +107,9 @@ $( document ).ready( function( ) {
                   //       console.log( snapshot.val( ) );
 
                   // } );
-
-                  king_voted_list.chid('user_id').orderByChild( 'user_id' )
-                        .equalTo( user.id )
+                  console.log( firebase.auth( ).currentUser.uid );
+                  king_voted_list.orderByKey( )
+                        .equalTo( user.uid )
                         .once( 'value' )
                         .then( function( snapshot ) {
                               var value = snapshot.val( );
@@ -127,8 +118,8 @@ $( document ).ready( function( ) {
                               }
                         } );
 
-                  queen_voted_list.orderByChild( 'user_id' )
-                        .equalTo( user.id )
+                  queen_voted_list.orderByKey( )
+                        .equalTo( user.uid )
                         .once( 'value' )
                         .then( function( snapshot ) {
                               var value = snapshot.val( );
