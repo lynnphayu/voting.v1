@@ -10,12 +10,8 @@ $( document ).ready( function( ) {
 
       var king_vote = firebase.database( ).ref( ).child( 'vote/king' );
       var queen_vote = firebase.database( ).ref( ).child( 'vote/queen' );
-      var smart_vote = firebase.database( ).ref( ).child( 'vote/smart' );
-      var style_vote = firebase.database( ).ref( ).child( 'vote/style' );
       var king_voted_list = firebase.database( ).ref( ).child( 'king' );
       var queen_voted_list = firebase.database( ).ref( ).child( 'queen' );
-      var smart_voted_list = firebase.database( ).ref( ).child( 'smart' );
-      var style_voted_list = firebase.database( ).ref( ).child( 'style' );
 
       $( '#Glide' ).hide( );
       $( "#Glide" ).glide( {
@@ -28,9 +24,7 @@ $( document ).ready( function( ) {
             king_vote.transaction( function( vote ) {
                   if ( vote != null ) {
                         vote++;
-                        var obj = {};
-                        obj[ 'king_voted_list/'+firebase.auth().currentUser ] = 1;
-                        king_voted_list.update(obj);
+                        king_vote.set({ user_id : firebase.auth().currentUser });
                         $( '.king' ).prop( 'disabled', true );
                   }
                   return vote;
@@ -40,30 +34,15 @@ $( document ).ready( function( ) {
       $( '.queen' ).click( function( e ) {
             e.preventDefault( );
             queen_vote.transaction( function( vote ) {
-                  if ( vote != null ) {
+                  // if ( vote != null ) {
                         vote++;
-                        var obj = {};
-                        obj[ 'queen_voted_list/'+firebase.auth().currentUser] = 1;
-                        queen_voted_list.update(obj);
+                        queen_vote.set({ user_id : firebase.auth().currentUser });
                         $( '.queen' ).prop( 'disabled', true );
-                  }
+                  // }
                   return vote;
             } );
       } );
 
-      $( '.smart' ).click( function( e ) {
-            e.preventDefault( );
-            smart_vote.transaction( function( vote ) {
-                  if ( vote != null ) {
-                        vote++;
-                        var obj = {};
-                        obj[ 'smart_voted_list/'+firebase.auth().currentUser] = 1;
-                        smart_voted_list.update(obj);
-                        $( '.smart' ).prop( 'disabled', true );
-                  }
-                  return vote;
-            } );
-      } );
 
       $( '.style' ).click( function( e ) {
             e.preventDefault( );
@@ -71,8 +50,8 @@ $( document ).ready( function( ) {
                   if ( vote != null ) {
                         vote++;
                         var obj = {};
-                        obj[  'style_voted_list/'+firebase.auth().currentUser] = 1;
-                        style_voted_list.update(obj);
+                        obj[ 'style_voted_list/' + firebase.auth( ).currentUser ] = 1;
+                        style_voted_list.update( obj );
                         $( '.style' ).prop( 'disabled', true );
                   }
                   return vote;
@@ -91,37 +70,27 @@ $( document ).ready( function( ) {
                         $( '#Glide' ).show( );
                         console.log( result.user.uid );
                         current_user_id = result.user.id;
-                        king_voted_list.child( result.user.uid ).once( 'value', function( snapshot ) {
-                              if ( snapshot.val( ) !== null ) {
-                                    $( '.king' ).prop( 'disabled', true );
-                              }
-                              console.log( snapshot.val( ) );
 
-                        } );
+                        king_voted_list.orderByChild( 'user_id' )
+                              .equalTo( user.id )
+                              .once( 'value' )
+                              .then( function( snapshot ) {
+                                    var value = snapshot.val( );
+                                    if ( value ) {
+                                          $( '.king' ).prop( 'disabled', true );
+                                    }
+                              } );
 
-                        queen_voted_list.child( result.user.uid ).once( 'value', function( snapshot ) {
-                              if ( snapshot.val( ) !== null ) {
-                                    $( '.queen' ).prop( 'disabled', true );
-                              }
-                              console.log( snapshot.val( ) );
+                        queen_voted_list.orderByChild( 'user_id' )
+                              .equalTo( user.id )
+                              .once( 'value' )
+                              .then( function( snapshot ) {
+                                    var value = snapshot.val( );
+                                    if ( value ) {
+                                          $( '.queen' ).prop( 'disabled', true );
+                                    }
+                              } );
 
-                        } );
-
-                        smart_voted_list.child( result.user.uid ).once( 'value', function( snapshot ) {
-                              if ( snapshot.val( ) !== null ) {
-                                    $( '.smart' ).prop( 'disabled', true );
-                              }
-                              console.log( snapshot.val( ) );
-
-                        } );
-
-                        style_voted_list.child( result.user.uid ).once( 'value', function( snapshot ) {
-                              if ( snapshot.val( ) !== null ) {
-                                    $( '.style' ).prop( 'disabled', true );
-                              }
-                              console.log( snapshot.val( ) );
-
-                        } );
                   } )
                   .catch( function( error ) {
                         var errorCode = error.code;
@@ -139,40 +108,36 @@ $( document ).ready( function( ) {
             if ( user ) {
                   console.log( user );
                   $( '#facebook_login' ).hide( );
-                        $( '#Glide' ).show( );
-                        console.log( result.user.uid );
-                        current_user_id = result.user.id;
-                        king_voted_list.child( result.user.uid ).once( 'value', function( snapshot ) {
-                              if ( snapshot.val( ) !== null ) {
+                  $( '#Glide' ).show( );
+                  // king_voted_list.child( result.user.uid ).once( 'value', function( snapshot ) {
+                  //       if ( snapshot.val( ) !== null ) {
+                  //             $( '.king' ).prop( 'disabled', true );
+                  //       }
+                  //       console.log( snapshot.val( ) );
+
+                  // } );
+
+                  king_voted_list.orderByChild( 'user_id' )
+                        .equalTo( user.id )
+                        .once( 'value' )
+                        .then( function( snapshot ) {
+                              var value = snapshot.val( );
+                              if ( value ) {
                                     $( '.king' ).prop( 'disabled', true );
                               }
-                              console.log( snapshot.val( ) );
-
                         } );
 
-                        queen_voted_list.child( result.user.uid ).once( 'value', function( snapshot ) {
-                              if ( snapshot.val( ) !== null ) {
+                  queen_voted_list.orderByChild( 'user_id' )
+                        .equalTo( user.id )
+                        .once( 'value' )
+                        .then( function( snapshot ) {
+                              var value = snapshot.val( );
+                              if ( value ) {
                                     $( '.queen' ).prop( 'disabled', true );
                               }
-                              console.log( snapshot.val( ) );
-
                         } );
 
-                        smart_voted_list.child( result.user.uid ).once( 'value', function( snapshot ) {
-                              if ( snapshot.val( ) !== null ) {
-                                    $( '.smart' ).prop( 'disabled', true );
-                              }
-                              console.log( snapshot.val( ) );
 
-                        } );
-
-                        style_voted_list.child( result.user.uid ).once( 'value', function( snapshot ) {
-                              if ( snapshot.val( ) !== null ) {
-                                    $( '.style' ).prop( 'disabled', true );
-                              }
-                              console.log( snapshot.val( ) );
-
-                        } );
             } else {
                   console.log( "No User!" )
             }
