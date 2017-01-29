@@ -35,8 +35,8 @@ button:disabled {
 
 .vote {
         bottom: 15%;
-        margin: 0 23pt;
-        width: 150pt;
+        margin: 0 0.3in;
+        width: 2in;
         color: white;
         position: absolute;
         padding: 10px;
