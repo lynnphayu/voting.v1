@@ -32,16 +32,13 @@ button:disabled {
         padding: 30px;
 }
 
-.button_gp {
-        position: absolute;
-        bottom: 15%;
-}
 
 .vote {
-        margin-left: 3vw;
-        width: 35vw;
+        bottom: 15%;
+        margin: 0 23pt;
+        width: 150pt;
         color: white;
-        position: relative;
+        position: absolute;
         padding: 10px;
         border: 1px solid white;
         background: none;
@@ -49,8 +46,8 @@ button:disabled {
 
 .img {
         width: 97%;
-        margin: 1vh auto;
-        height: 90%;
+        margin: 2% auto;
+        height: 88%;
         background-repeat: no-repeat;
         background-position: center center;
         background-size: auto 100%;
